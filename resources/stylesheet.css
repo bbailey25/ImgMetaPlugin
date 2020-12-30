@@ -1,0 +1,15 @@
+.location_list {
+    overflow:hidden;
+    overflow-y:scroll;
+    height:140px;
+    width: 300px;
+    border: 2px solid black;
+}
+
+.loc_list_item {
+    margin-left: 5px;
+}
+
+.highlight {
+    background-color: grey;
+}
