@@ -1,39 +1,39 @@
 jQuery(document).ready(function ($) {
-    var form = document.getElementById('formTest');
-    // var locationForm = document.getElementById('locationForm');
-    var addButton = document.getElementById('addButton');
-    var clearButton = document.getElementById('clearButton');
-    var addEntryBtn = document.getElementById('addEntryBtn');
-    var deleteEntryBtn = document.getElementById('deleteEntryBtn');
-    var addLocationBtn = document.getElementById('addLocationBtn');
-    var deleteLocationBtn = document.getElementById('deleteLocationBtn');
-    var businessName = document.getElementById('businessName');
-    var altText = document.getElementById('altText');
-    var phone = document.getElementById('phone');
-    var link = document.getElementById('link');
-    var description = document.getElementById('description');
-    var addEntrySelect = document.getElementById('businesses');
+
     var links = "";
 
+    /*
+    Description: Writes the description containing the entry name, alternate
+                 text, phone number, and any links associated.
+    */
     function writeDescription() {
+        var entryName = document.getElementById('entryName');
+        var altText = document.getElementById('altText');
+        var phone = document.getElementById('phone');
 
-        description.value = altText.value + '\n' +
-            businessName.value + '\n' +
+        document.getElementById('description').value =
+            altText.value + '\n' +
+            entryName.value + '\n' +
             phone.value + '\n' +
             links;
     }
 
+    /*
+    Description: Clears all the locations lists of their contents. Used before
+                 repopulating locations from the database.
+    */
     function clearLocationData() {
         var locationsSelect = document.getElementById('locationsSelect');
-        var location_list = document.getElementById('location_list');
-        var locationsSelectOutput = document.getElementById('locationsSelectOutput');
+        var locationList = document.getElementById('locationList');
+        var locationsSelectOutput =
+            document.getElementById('locationsSelectOutput');
 
         while (locationsSelect.firstChild) {
             locationsSelect.removeChild(locationsSelect.firstChild);
         }
 
-        while (location_list.firstChild) {
-            location_list.removeChild(location_list.firstChild);
+        while (locationList.firstChild) {
+            locationList.removeChild(locationList.firstChild);
         }
 
         while (locationsSelectOutput.firstChild) {
@@ -41,10 +41,15 @@ jQuery(document).ready(function ($) {
         }
     }
 
+    /*
+    Description: Takes a list of locations to populate the various lists and
+                 selects with.
+    */
     function repopulateLocationData(locations = null) {
         var locationsSelect = document.getElementById('locationsSelect');
-        var locationsSelectOutput = document.getElementById('locationsSelectOutput');
-        var location_list = document.getElementById('location_list');
+        var locationsSelectOutput =
+            document.getElementById('locationsSelectOutput');
+        var locationList = document.getElementById('locationList');
 
         var option = document.createElement('option');
         option.text = "NO LOCATION DATA";
@@ -64,18 +69,25 @@ jQuery(document).ready(function ($) {
                 var li = document.createElement('li');
                 li.appendChild(document.createTextNode(locations[i]));
                 li.setAttribute('class', 'loc_list_item');
-                location_list.appendChild(li);
+                locationList.appendChild(li);
             }
         }
     }
 
+    /*
+    Description: Takes a location name (format: city, state), the latitude, and
+                 the longitude. Passes those to the location database through an
+                 ajax call. On a successful return, the database will send an
+                 array of all current locations in the database. Clear the
+                 location lists and repopulate them with the up-to-date data.
+    */
     function addLocationDbEntry(locationName, latitude, longitude) {
 
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'my_action5',
+                action: 'dbAddLocationEntry',
                 location_name: locationName,
                 latitude: latitude,
                 longitude: longitude
@@ -86,164 +98,223 @@ jQuery(document).ready(function ($) {
                 repopulateLocationData(locations);
             },
             error: function () {
-                alert('boo');
+                alert('Error adding a location to the database.');
             }
         });
     }
 
-    function databaseEntryExists() {
-        var someBool = false;
+    /*
+    Desciption: Checks to see if the preset entry already exists in the preset
+                entry database. Returns false if the entry does not exist or if
+                there was an error of any sort. Returns true if the entry
+                already exists in the database.
+    */
+    function presetEntryExists() {
+        var entryExists = false;
+        var entryName = document.getElementById('entryName');
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'my_action3',
-                business_name: businessName.value
+                action: 'dbPresetEntryExists',
+                entry_name: entryName.value
             },
-            async: false,               //ensures the ajax request finishes before continuing
-            success: function (data) {
-                if (data > 0) {
-                    someBool = true;
-                }
-            },
-            error: function () {
-                alert('boo');
-            }
-        });
-
-        return someBool;
-    }
-
-    function locationEntryExists(locationName) {
-        var someBool = false;
-        $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'my_action6',
-                location_name: locationName
-            },
+            // Ensures the ajax request finishes before continuing.
             async: false,
             success: function (data) {
                 if (data > 0) {
-                    someBool = true;
+                    entryExists = true;
                 }
             },
             error: function () {
-                alert('boo');
+                alert('Error checking if the preset entry exists in the database.');
             }
         });
 
-        return someBool;
+        return entryExists;
     }
 
-    function addDatabaseEntry() {
+    /*
+    Description: Checks to see if the location entry already exiss in the
+                 location database. Returns false if it does not exist or if 
+                 there is an error. Returns true if it does exist.
+    */
+    function locationEntryExists(locationName) {
+        var entryExists = false;
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'dbLocationEntryExists',
+                location_name: locationName
+            },
+            // Ensures the ajax request finishes before continuing.
+            async: false,
+            success: function (data) {
+                if (data > 0) {
+                    entryExists = true;
+                }
+            },
+            error: function () {
+                alert('Error checking if the location already exists in the database.');
+            }
+        });
+
+        return entryExists;
+    }
+
+    /*
+    Description: Gathers the information in the various preset fields and sends
+                 it through an ajax call to add to the preset database.
+    */
+    function addPreset() {
 
         var locationSelect = document.getElementById('locationsSelect');
-        var selectedLocation = locationSelect.options[locationSelect.selectedIndex].value;
+        var selectedLocation =
+            locationSelect.options[locationSelect.selectedIndex].value;
+        var entryName = document.getElementById('entryName');
+        var altText = document.getElementById('altText');
+        var phone = document.getElementById('phone');
 
-        // Remove the trailing new line
+        // Remove the trailing new line.
         links = links.replace(/\n$/, '');
 
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'my_action',
-                business_name: businessName.value,
-                business_alt_txt: altText.value,
-                business_phone: phone.value,
-                business_links: links,
-                business_location: selectedLocation
+                action: 'dbAddPresetEntry',
+                entry_name: entryName.value,
+                entry_alt_txt: altText.value,
+                entry_phone: phone.value,
+                img_meta_links: links,
+                entry_location: selectedLocation
             },
             error: function () {
-                alert('boo');
+                alert('Error adding the preset entry to the database.');
             }
         });
     }
 
-    function removeDatabaseEntry(business) {
+    /*
+    Description: Takes an entry name and sends an ajax request to have that
+                 entry name removed from the preset database and its associated
+                 links in the link database. 
+    */
+    function removeEntry(entryName) {
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'my_action4',
-                business_name: business
+                action: 'dbRemovePresetEntry',
+                entry_name: entryName
             },
             error: function () {
-                alert('boo');
+                alert('Error when removing entry.');
             }
         });
     }
 
-    function returnDatabaseEntry(business) {
+    /*
+    Description: Takes an entry name and sends an ajax request to return all the
+                 data associated. Includes location, alt_txt, phone number, 
+                 and links. If the ajax request succeeds it takes all that data
+                 in array form and sets the various fields associated.
+    */
+    function returnEntry(entry) {
 
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'my_action2',
-                business_name: business
+                action: 'dbReturnPresetEntry',
+                entry_name: entry
             },
             success: function (data) {
-                something = JSON.parse(data);
+                entryData = JSON.parse(data);
 
                 // This will put the location associated with the selected
-                // business at the top of a drop down. This will allow the
+                // entry at the top of a drop down. This will allow the
                 // user to decide if they want the location associated or
-                // have no location on the selected images.
+                // have no location on the selected images(s).
                 var option, i = 0;
-                var locationOutput = document.getElementById('locationsSelectOutput');
+                var locationOutput =
+                    document.getElementById('locationsSelectOutput');
                 while (option = locationOutput.options[i++]) {
-                    if (option.value == something[0]['business_location']) {
+                    if (option.value == entryData[0]['entry_location']) {
                         option.selected = true;
                         break;
                     }
                 }
 
-                document.getElementById('businessNameOutput').value = something[0]['business_name'];
-                document.getElementById('altTextOutput').value = something[0]['business_alt_txt'];
-                document.getElementById('phoneOutput').value = something[0]['business_phone'];
+                document.getElementById('entryNameOutput').value =
+                    entryData[0]['entry_name'];
+                document.getElementById('altTextOutput').value =
+                    entryData[0]['entry_alt_txt'];
+                document.getElementById('phoneOutput').value =
+                    entryData[0]['entry_phone'];
 
                 linkVal = "";
                 descriptionVal =
-                    something[0]['business_alt_txt'] + '\n' +
-                    something[0]['business_name'] + '\n' +
-                    something[0]['business_phone'] + '\n';
+                    entryData[0]['entry_alt_txt'] + '\n' +
+                    entryData[0]['entry_name'] + '\n' +
+                    entryData[0]['entry_phone'] + '\n';
 
-                for (var i = 0; i < something.length; i++) {
-                    var obj = something[i].link;
-                    linkVal = linkVal + obj + ', ';
-                    descriptionVal = descriptionVal + obj + '\n';
+                // Puts the links in a nice comma-separated string.
+                for (var i = 0; i < entryData.length; i++) {
+                    var link = entryData[i].link;
+                    linkVal = linkVal + link + ', ';
+                    descriptionVal = descriptionVal + link + '\n';
                 }
 
-                // Remove trailing comma and space
+                // Remove trailing comma and space.
                 linkVal = linkVal.replace(/, $/, '');
                 document.getElementById('linksOutput').value = linkVal;
-                document.getElementById('descriptionOutput').value = descriptionVal;
+                document.getElementById('descriptionOutput').value =
+                    descriptionVal;
+            },
+            error: function () {
+                alert('Error returning preset entry.');
             }
         });
     }
 
+    /*
+    Description: Clears all the output entry data. Usually called when the user 
+                 selects a different entry to display or when an entry gets 
+                 deleted.
+    */
     function clearEntryData() {
-        document.getElementById('businessNameOutput').value = "";
+        document.getElementById('entryNameOutput').value = "";
         document.getElementById('altTextOutput').value = "";
         document.getElementById('phoneOutput').value = "";
         document.getElementById('linksOutput').value = "";
         document.getElementById('descriptionOutput').value = "";
     }
 
+    /*
+    Description: This just allows the user to highlight their location choice
+                 so they can be sure which location they are deleting.
+    */
     $('.location_list').on('click', 'li', function () {
         $('.highlight').removeClass('highlight');
         $(this).addClass('highlight');
     });
 
-    form.oninput = function () {
-
+    /*
+    Description: This just keeps the description part dynamic when the user is
+                 adding a new preset.
+    */
+    document.getElementById('formTest').oninput = function () {
         writeDescription();
     };
 
-    addButton.onclick = function () {
+    /*
+    Description: When this add button is clicked it adds a link to the link list
+                 and to the bottom of the description.
+    */
+    document.getElementById('addLinkBtn').onclick = function () {
+        var link = document.getElementById('link');
         if (link.value.trim() != "") {
             links = links + link.value + '\n';
             link.value = "";
@@ -251,43 +322,68 @@ jQuery(document).ready(function ($) {
         }
     };
 
-    addEntryBtn.onclick = function () {
-        // Ensure no blank business names get accepted
-        businessName.value = businessName.value.trim();
-        if (businessName.value != "") {
-            if (!databaseEntryExists()) {
+    /*
+    Description: When this add button is clicked it first checks to make sure
+                 the entry name is not blank. It then confirms that the entry
+                 name has not already been used. If both of those succeed it 
+                 adds a new option to the entries select, adds the entry to the
+                 database through the addPreset function call, clears the
+                 fields, and writes the description again (blank).
+    */
+    document.getElementById('addEntryBtn').onclick = function () {
+        // Ensure no blank entry names get accepted.
+        var entryName = document.getElementById('entryName');
+        var altText = document.getElementById('altText');
+        var phone = document.getElementById('phone');
+        entryName.value = entryName.value.trim();
+        if (entryName.value != "") {
+            if (!presetEntryExists()) {
                 var option = document.createElement("option");
-                option.value = businessName.value;
-                option.text = businessName.value;
-                addEntrySelect.add(option);
-                addDatabaseEntry();
-                businessName.value = "";
+                option.value = entryName.value;
+                option.text = entryName.value;
+                document.getElementById('entriesSelect').add(option);
+                addPreset();
+                entryName.value = "";
                 altText.value = "";
                 phone.value = "";
                 links = "";
                 writeDescription();
             }
             else {
-                alert('Business name has already been used. Try again.');
+                alert('Entry name has already been used. Try again.');
             }
         }
         else {
-            alert('Business name can\'t be blank. Try again.');
+            alert('Entry name can\'t be blank. Try again.');
         }
     };
 
-    deleteEntryBtn.onclick = function () {
-        var business = addEntrySelect.options[addEntrySelect.selectedIndex].text;
-        if (business != "NO DATA") {
-            removeDatabaseEntry(business);
+    /*
+    Description: When the delete entry button is clicked we check to see what
+                 entry the user wants to be deleted. If it isn't the "NO DATA"
+                 option, because we always want that there, then we remove the
+                 entry from the database through removeEntry, clear the entry
+                 output data, and remove the select.
+    */
+    document.getElementById('deleteEntryBtn').onclick = function () {
+        var addEntrySelect = document.getElementById('entriesSelect');
+        var entry = addEntrySelect.options[addEntrySelect.selectedIndex].text;
+        if (entry != "NO DATA") {
+            removeEntry(entry);
             clearEntryData();
-            $("#businesses option:selected").remove();
+            $("#entriesSelect option:selected").remove();
         }
     };
 
-    addLocationBtn.onclick = function () {
-
-        // Ensure no blank locations get accepted
+    /*
+    Description: When the add location button is clicked it first checks to make
+                 sure that none of the fields are blank. It then ensures that
+                 the location has not already been added to the location
+                 database. If both of those things are true, the location is
+                 added to the location database and the location fields are
+                 cleared.
+    */
+    document.getElementById('addLocationBtn').onclick = function () {
         var cityName = document.getElementById('cityName');
         var stateName = document.getElementById('stateName');
         var latitude = document.getElementById('latitude');
@@ -297,9 +393,14 @@ jQuery(document).ready(function ($) {
             (stateName.value.trim() != "") &&
             (latitude.value.trim() != "") &&
             (longitude.value.trim() != "")) {
-            var locationName = cityName.value.trim() + ", " + stateName.value.trim();
+
+            var locationName = cityName.value.trim() +
+                ", " +
+                stateName.value.trim();
             if (!locationEntryExists(locationName)) {
-                addLocationDbEntry(locationName, latitude.value, longitude.value);
+                addLocationDbEntry(locationName,
+                    latitude.value,
+                    longitude.value);
                 cityName.value = "";
                 stateName.value = "";
                 latitude.value = "";
@@ -314,15 +415,29 @@ jQuery(document).ready(function ($) {
         }
     };
 
-    clearButton.onclick = function () {
+    /*
+    Description: When the clear links button is clicked the links string is
+                 emptied, link field is emptied, and the description is typed
+                 again to reflect this.
+    */
+    document.getElementById('clearLinksBtn').onclick = function () {
         links = "";
-        link.value = "";
+        document.getElementById('link').value = "";
         writeDescription();
     };
 
-    deleteLocationBtn.onclick = function () {
-        var location_list = document.getElementById("location_list");
-        var listItems = location_list.getElementsByTagName('li');
+    /*
+    Description: When the delete location button is clicked the location list
+                 is traversed for the highlighted location. This is the location
+                 the user wants deleted. If there is a location highlighted an
+                 ajax call will remove the selected location from the database.
+                 On success, the ajax call will return an array of locations
+                 which are used to repopulate the location lists once the data
+                 is cleared.
+    */
+    document.getElementById('deleteLocationBtn').onclick = function () {
+        var locationList = document.getElementById("locationList");
+        var listItems = locationList.getElementsByTagName('li');
         var selectedItem = '';
 
         for (var i = 0; i < listItems.length; i++) {
@@ -336,7 +451,7 @@ jQuery(document).ready(function ($) {
                 url: ajaxurl,
                 type: 'POST',
                 data: {
-                    action: 'my_action7',
+                    action: 'dbRemoveLocationEntry',
                     location_name: selectedItem
                 },
                 success: function (data) {
@@ -345,21 +460,29 @@ jQuery(document).ready(function ($) {
                     repopulateLocationData(locations);
                 },
                 error: function () {
-                    alert('boo');
+                    alert('Error deleting the location.');
                 }
             });
         }
     };
 
-    document.getElementById('businesses').onchange = function () {
-        var business = addEntrySelect.options[addEntrySelect.selectedIndex].text;
+    /*
+    Description: When the user selects a new entry from the dropdown this
+                 function is triggered. If the entry selected is "NO DATA", the
+                 fields are emptied. Otherwise returnEntry is called to handle
+                 the database interaction required to get the entry information.
+    */
+    document.getElementById('entriesSelect').onchange = function () {
+        var addEntrySelect = document.getElementById('entriesSelect');
+        var entry = addEntrySelect.options[addEntrySelect.selectedIndex].text;
 
-        if (business == "NO DATA") {
+        if (entry == "NO DATA") {
             clearEntryData();
-            document.getElementById('locationsSelectOutput').options[0].selected = true;
+            document.getElementById(
+                'locationsSelectOutput').options[0].selected = true;
         }
         else {
-            returnDatabaseEntry(business);
+            returnEntry(entry);
         }
     };
 });

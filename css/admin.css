@@ -1,3 +1,40 @@
+body {
+    background-color: #f8f8ff;
+}
+
+.header_div h1 {
+    text-align: center;
+    color: black;
+}
+
+.header_div h4 {
+    text-align: center;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header_div hr {
+    margin-left: -20px;
+    border: 1px solid #a9a9a9;
+}
+
+.location_div {
+    display: flex;
+    justify-content: center;
+}
+
+.location_div div {
+    margin-left: 100px;
+    flex: 1;
+}
+
+.line_divider {
+    margin-left: 40px;
+    margin-right: 40px;
+    border: 1px solid #a9a9a9;
+}
+
 .location_list {
     overflow:hidden;
     overflow-y:scroll;
@@ -6,8 +43,18 @@
     border: 2px solid black;
 }
 
+.preset_div {
+    display: flex;
+    justify-content: center;
+}
+
+.preset_div div {
+    margin-left: 100px;
+    flex: 1;
+}
+
 .loc_list_item {
-    margin-left: 5px;
+    padding-left: 5px;
 }
 
 .highlight {
