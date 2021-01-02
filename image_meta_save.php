@@ -1,9 +1,25 @@
 <?php
 /*
-Plugin Name: Image Meta Data
-Description: A plugin used to add meta data to images. The meta data can be saved in a preset in a database to be used over and over.
+Plugin Name: Image Meta Save
+Description: A plugin used to add meta data to images and upload them to the media library. The meta data can be saved together as a preset in a database to be used over and over.
 Author: Blake Bailey
-Version: 0.1
+License: GPL2+
+Version: 1.0
+*/
+
+/*
+Image Meta Save is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+any later version.
+ 
+Image Meta Save is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License
+along with Image Meta Save. If not, see <http://www.gnu.org/licenses/>.
 */
 
 require_once(ABSPATH . 'wp-content/plugins/image_meta_data/ajax_functions.php');
@@ -31,10 +47,10 @@ function enqueue_external_files()
  
 function img_meta_setup_menu()
 {
-    $my_page = add_menu_page('Image Meta', 
-                             'Image Meta',
+    $my_page = add_menu_page('Image Meta Save', 
+                             'Image Meta Save',
                              'manage_options',
-                             'image-meta',
+                             'image-meta-save',
                              'img_meta_init' );
 
     // Load the JS and CSS conditionally to avoid loading on other admin pages
@@ -53,7 +69,7 @@ function img_meta_init()
 ?>
     <body>
         <div class='header_div'>        
-            <h1>Image Meta<br></h1>
+            <h1>Image Meta Save<br></h1>
             <h4>
                 Upload images to the media library with saved meta data information
             </h4>

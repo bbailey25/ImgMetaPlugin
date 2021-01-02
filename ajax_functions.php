@@ -9,9 +9,6 @@ add_action('wp_ajax_dbAddLocationEntry', 'dbAddLocationEntry');
 add_action('wp_ajax_dbLocationEntryExists', 'dbLocationEntryExists');
 add_action('wp_ajax_dbRemoveLocationEntry', 'dbRemoveLocationEntry');
 
-/*
-Description: Adds a preset entry to its database.
-*/
 function dbAddPresetEntry() 
 {
     global $wpdb;
@@ -106,6 +103,7 @@ function dbAddLocationEntry() {
 function dbLocationEntryExists() {
     global $wpdb;
 
+    // Checks to see if the location entry exists.
     $sql = "SELECT * FROM wp_img_meta_locations WHERE location_name =
         '".$_POST['location_name']."';";
     echo($wpdb->query($sql));
@@ -116,9 +114,11 @@ function dbLocationEntryExists() {
 function dbRemoveLocationEntry() {
     global $wpdb;
 
+    // Remove a location from the database.
     $wpdb->delete('wp_img_meta_locations', 
                   array('location_name' => $_POST['location_name']));
 
+    // Return an array of locations still in the database.
     $results = $wpdb->get_col(
         "SELECT location_name FROM wp_img_meta_locations;");
     echo json_encode($results);
