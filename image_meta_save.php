@@ -131,7 +131,7 @@ function imgMD_init()
                         global $wpdb;
                         $results = $wpdb->get_col("SELECT imgMD_entry_name FROM wp_imgMD_presets;");
                         foreach ($results as $result) {
-                            echo "<option value='$result'>$result</option>";
+                            echo "<option>$result</option>";
                         }
                     ?>
                 </select> 
@@ -141,9 +141,9 @@ function imgMD_init()
 
                 <!-- form to handle the upload - The enctype value here is very important -->
                 <form  method="post" enctype="multipart/form-data">
-                    Name: <input id='imgMD_entry_name_upload' name='imgMD_entry_name_upload' readonly/> <br>
-                    Alt-txt: <input id='imgMD_alt_text_upload' name='imgMD_alt_text_upload' readonly/> <br>
-                    Phone Number: <input id='imgMD_phone_upload' name='imgMD_phone_upload' readonly/> <br>
+                    Name: <input type='text' id='imgMD_entry_name_upload' name='imgMD_entry_name_upload' readonly/> <br>
+                    Alt-txt: <input type='text' id='imgMD_alt_text_upload' name='imgMD_alt_text_upload' readonly/> <br>
+                    Phone Number: <input type='text' id='imgMD_phone_upload' name='imgMD_phone_upload' readonly/> <br>
                     Location: <select id="imgMD_location_select_output" name="imgMD_location_select_output">
                             <option>NO LOCATION DATA</option>
                             <?php

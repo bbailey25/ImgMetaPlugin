@@ -389,29 +389,42 @@ jQuery(document).ready(function ($) {
         var latitude = document.getElementById('imgMD_latitude');
         var longitude = document.getElementById('imgMD_longitude');
 
-        if ((cityName.value.trim() != "") &&
-            (stateName.value.trim() != "") &&
-            (latitude.value.trim() != "") &&
-            (longitude.value.trim() != "")) {
 
-            var locationName = cityName.value.trim() +
-                ", " +
-                stateName.value.trim();
-            if (!imgMD_locationEntryExists(locationName)) {
-                imgMD_addLocationDbEntry(locationName,
-                    latitude.value,
-                    longitude.value);
-                cityName.value = "";
-                stateName.value = "";
-                latitude.value = "";
-                longitude.value = "";
-            }
-            else {
-                alert('Location has already been used. Try again.')
-            }
+        // Ensure that no values are blank and they are of the right type
+        if ((cityName.value.trim() == "") ||
+            (stateName.value.trim() == "") ||
+            (latitude.value.trim() == "") ||
+            (longitude.value.trim() == "")) {
+
+            alert('No location information can be missing. Latitude and \
+                Longitude must be numbers. Try again.');
+            return;
+        }
+
+        // Range check our latitude and longitude values to make sure they are
+        // valid values.
+        if (latitude.value < -90 || latitude.value > 90) {
+            alert('Latitude is out of range. Valid values are between -90 and \
+                +90. Try again.');
+            return;
+        }
+
+        if (longitude.value < -180 || longitude.value > 180) {
+            alert('Longitude is out of range. Valid values are between -180 \
+                and +180. Try again.');
+            return;
+        }
+
+        var locationName = cityName.value.trim() + ", " + stateName.value.trim();
+        if (!imgMD_locationEntryExists(locationName)) {
+            imgMD_addLocationDbEntry(locationName, latitude.value, longitude.value);
+            cityName.value = "";
+            stateName.value = "";
+            latitude.value = "";
+            longitude.value = "";
         }
         else {
-            alert('No Location Information Can Be Blank. Try again.');
+            alert('Location has already been used. Try again.')
         }
     };
 

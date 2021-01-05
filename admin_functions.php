@@ -82,7 +82,8 @@ function imgMD_handle()
 
                     $metadata = wp_get_attachment_metadata($attachment_id,
                                                            true);
-                    $locationSelection = $_POST['imgMD_location_select_output'];
+
+                    $locationSelection = sanitize_text_field($_POST['imgMD_location_select_output']);
 
                     if (!empty($exifLatitude) &&
                         !empty($exifLatitudeRef) &&
@@ -130,17 +131,17 @@ function imgMD_handle()
 
                     if (isset($_REQUEST['imgMD_entry_name_upload'])) 
                     {
-                        $entryName = $_REQUEST['imgMD_entry_name_upload'];
+                        $entryName = sanitize_text_field($_REQUEST['imgMD_entry_name_upload']);
                     }
         
                     if (isset($_REQUEST['imgMD_alt_text_upload'])) 
                     {
-                        $entryAltText = $_REQUEST['imgMD_alt_text_upload'];
+                        $entryAltText = sanitize_text_field($_REQUEST['imgMD_alt_text_upload']);
                     }
         
                     if (isset($_REQUEST['imgMD_description_upload'])) 
                     {
-                        $entryDescription = $_REQUEST['imgMD_description_upload'];
+                        $entryDescription = sanitize_textarea_field($_REQUEST['imgMD_description_upload']);
                     }
                     
                     $my_image_meta = array(
@@ -230,7 +231,7 @@ function imgMD_populateLocationOptions($type, $classes = null)
     if ($classes == null)
     {
         foreach ($cities as $city) {
-            echo "<$type value='$city'>$city</$type>";
+            printf("<$type>$city</$type>");
         }
     }
     else
@@ -241,7 +242,11 @@ function imgMD_populateLocationOptions($type, $classes = null)
             $classString .= $class . ' ';
         }
         foreach ($cities as $city) {
-            echo "<$type value='$city' class='$classString'>$city</$type>";
+            printf("<%s class='%s'>%s</%s>",
+                    $type,
+                    esc_attr($classString),
+                    $city,
+                    $type);
         }
     }
 }

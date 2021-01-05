@@ -2,13 +2,13 @@ body {
     background-color: #f8f8ff;
 }
 
-.imgMD_description {
+#imgMD_description {
     width: 300px;
     height: 200px;
     vertical-align:top;
 }
 
-.imgMD_description_upload {
+#imgMD_description_upload {
     width: 300px;
     height: 200px;
     vertical-align: top;
