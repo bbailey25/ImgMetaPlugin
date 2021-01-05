@@ -4,10 +4,10 @@
 Description: This function takes a location name and uses that to fetch location
              data from the database and return it.
 */
-function dbReturnLocationEntry($locationName) {
+function imgMD_dbReturnLocationEntry($locationName) {
     global $wpdb;
-    $sql = "SELECT location_name, latitude, longitude FROM wp_img_meta_locations
-        WHERE location_name = '$locationName';";
+    $sql = "SELECT imgMD_location_name, imgMD_latitude, imgMD_longitude FROM wp_imgMD_locations
+        WHERE imgMD_location_name = '$locationName';";
     $results = $wpdb->get_results($sql);
 
     return $results;
@@ -24,7 +24,7 @@ Description: This function is responsible for handling the image uploading. It
              descripton before updating the post once more. That's one photo. It
              will do this for each one in the array of images.
 */
-function img_meta_handle()
+function imgMD_handle()
 {
     if ($_SERVER['REQUEST_METHOD'] == 'POST')
     {
@@ -32,7 +32,7 @@ function img_meta_handle()
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         require_once(ABSPATH . 'wp-admin/includes/media.php');
 
-        $files = $_FILES['test_upload_img'];
+        $files = $_FILES['imgMD_upload_img'];
         foreach ($files['name'] as $key => $value)
         {
             if ($files['name'][$key])
@@ -50,7 +50,7 @@ function img_meta_handle()
                 $exifLongitude      = '';
                 $exifLongitudeRef   = '';
 
-                if (exif_imagetype($file['tmp_name']) && 
+                if ((exif_imagetype($file['tmp_name']) == IMAGETYPE_JPEG) && 
                     is_callable('exif_read_data'))
                 {
                     $exifData = exif_read_data($file['tmp_name']);
@@ -82,7 +82,7 @@ function img_meta_handle()
 
                     $metadata = wp_get_attachment_metadata($attachment_id,
                                                            true);
-                    $locationSelection = $_POST['locationsSelectOutput'];
+                    $locationSelection = $_POST['imgMD_location_select_output'];
 
                     if (!empty($exifLatitude) &&
                         !empty($exifLatitudeRef) &&
@@ -107,17 +107,16 @@ function img_meta_handle()
                         {
                             // Use location for post location data.
                             $locationInfo = 
-                                dbReturnLocationEntry($locationSelection);
+                                imgMD_dbReturnLocationEntry($locationSelection);
 
-                            $metadata['image_meta']['latitude'] = 
-                                format_dec_to_dms($locationInfo[0]->latitude);
+                            $metadata['image_meta']['latitude'] = imgMD_format_dec_to_dms($locationInfo[0]->imgMD_latitude);
                             $metadata['image_meta']['latitude_ref'] = 
-                                direction_char($locationInfo[0]->latitude,
+                                imgMD_direction_char($locationInfo[0]->imgMD_latitude,
                                                'latitude');
                             $metadata['image_meta']['longitude'] = 
-                                format_dec_to_dms($locationInfo[0]->longitude);
+                                imgMD_format_dec_to_dms($locationInfo[0]->imgMD_longitude);
                             $metadata['image_meta']['longitude_ref'] = 
-                                direction_char($locationInfo[0]->longitude, 
+                                imgMD_direction_char($locationInfo[0]->imgMD_longitude, 
                                                'longitude'); 
                         }
                         else
@@ -129,19 +128,19 @@ function img_meta_handle()
 
                     wp_update_attachment_metadata($attachment_id, $metadata);
 
-                    if (isset($_REQUEST['entryNameOutput'])) 
+                    if (isset($_REQUEST['imgMD_entry_name_upload'])) 
                     {
-                        $entryName = $_REQUEST['entryNameOutput'];
+                        $entryName = $_REQUEST['imgMD_entry_name_upload'];
                     }
         
-                    if (isset($_REQUEST['altTextOutput'])) 
+                    if (isset($_REQUEST['imgMD_alt_text_upload'])) 
                     {
-                        $entryAltText = $_REQUEST['altTextOutput'];
+                        $entryAltText = $_REQUEST['imgMD_alt_text_upload'];
                     }
         
-                    if (isset($_REQUEST['descriptionOutput'])) 
+                    if (isset($_REQUEST['imgMD_description_upload'])) 
                     {
-                        $entryDescription = $_REQUEST['descriptionOutput'];
+                        $entryDescription = $_REQUEST['imgMD_description_upload'];
                     }
                     
                     $my_image_meta = array(
@@ -172,7 +171,7 @@ function img_meta_handle()
 Description: Takes a coordinate in decimal form and converts it to dms (degrees,
              minutes, and seconds) form. Returns an array with three strings.
 */
-function format_dec_to_dms($coordinateDec)
+function imgMD_format_dec_to_dms($coordinateDec)
 {
     $coordinateDec = abs($coordinateDec);
     $degrees = floor($coordinateDec);
@@ -190,7 +189,7 @@ Description: Takes a coordinate value in decimal form and the type it is
              (latitude or longitude) and returns a character indicating the
              direction the decimal coordinate value corresponds to.
 */
-function direction_char($coordinateValue, $type)
+function imgMD_direction_char($coordinateValue, $type)
 {
     if ($coordinateValue >= 0)
     {
@@ -222,11 +221,11 @@ function direction_char($coordinateValue, $type)
 Description: Takes $type (e.g. option, li, etc) and a list of classes
              (defaults to NULL) to add.
 */
-function populateLocationOptions($type, $classes = null)
+function imgMD_populateLocationOptions($type, $classes = null)
 {
     global $wpdb;
-    $cities = $wpdb->get_col("SELECT location_name FROM 
-        wp_img_meta_locations;");
+    $cities = $wpdb->get_col("SELECT imgMD_location_name FROM 
+        wp_imgMD_locations;");
     
     if ($classes == null)
     {

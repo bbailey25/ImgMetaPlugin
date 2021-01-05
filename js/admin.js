@@ -6,12 +6,12 @@ jQuery(document).ready(function ($) {
     Description: Writes the description containing the entry name, alternate
                  text, phone number, and any links associated.
     */
-    function writeDescription() {
-        var entryName = document.getElementById('entryName');
-        var altText = document.getElementById('altText');
-        var phone = document.getElementById('phone');
+    function imgMD_writeDescription() {
+        var entryName = document.getElementById('imgMD_entry_name');
+        var altText = document.getElementById('imgMD_alt_text');
+        var phone = document.getElementById('imgMD_phone');
 
-        document.getElementById('description').value =
+        document.getElementById('imgMD_description').value =
             altText.value + '\n' +
             entryName.value + '\n' +
             phone.value + '\n' +
@@ -22,11 +22,11 @@ jQuery(document).ready(function ($) {
     Description: Clears all the locations lists of their contents. Used before
                  repopulating locations from the database.
     */
-    function clearLocationData() {
-        var locationsSelect = document.getElementById('locationsSelect');
-        var locationList = document.getElementById('locationList');
+    function imgMD_clearLocationData() {
+        var locationsSelect = document.getElementById('imgMD_locations_select');
+        var locationList = document.getElementById('imgMD_location_list');
         var locationsSelectOutput =
-            document.getElementById('locationsSelectOutput');
+            document.getElementById('imgMD_location_select_output');
 
         while (locationsSelect.firstChild) {
             locationsSelect.removeChild(locationsSelect.firstChild);
@@ -45,11 +45,11 @@ jQuery(document).ready(function ($) {
     Description: Takes a list of locations to populate the various lists and
                  selects with.
     */
-    function repopulateLocationData(locations = null) {
-        var locationsSelect = document.getElementById('locationsSelect');
+    function imgMD_repopulateLocationData(locations = null) {
+        var locationsSelect = document.getElementById('imgMD_locations_select');
         var locationsSelectOutput =
-            document.getElementById('locationsSelectOutput');
-        var locationList = document.getElementById('locationList');
+            document.getElementById('imgMD_location_select_output');
+        var locationList = document.getElementById('imgMD_location_list');
 
         var option = document.createElement('option');
         option.text = "NO LOCATION DATA";
@@ -68,7 +68,7 @@ jQuery(document).ready(function ($) {
                 locationsSelectOutput.add(option2);
                 var li = document.createElement('li');
                 li.appendChild(document.createTextNode(locations[i]));
-                li.setAttribute('class', 'loc_list_item');
+                li.setAttribute('class', 'imgMD_location_list_item');
                 locationList.appendChild(li);
             }
         }
@@ -81,21 +81,21 @@ jQuery(document).ready(function ($) {
                  array of all current locations in the database. Clear the
                  location lists and repopulate them with the up-to-date data.
     */
-    function addLocationDbEntry(locationName, latitude, longitude) {
+    function imgMD_addLocationDbEntry(locationName, latitude, longitude) {
 
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'dbAddLocationEntry',
-                location_name: locationName,
-                latitude: latitude,
-                longitude: longitude
+                action: 'imgMD_dbAddLocationEntry',
+                imgMD_location_name: locationName,
+                imgMD_latitude: latitude,
+                imgMD_longitude: longitude
             },
             success: function (data) {
                 locations = JSON.parse(data);
-                clearLocationData();
-                repopulateLocationData(locations);
+                imgMD_clearLocationData();
+                imgMD_repopulateLocationData(locations);
             },
             error: function () {
                 alert('Error adding a location to the database.');
@@ -109,15 +109,15 @@ jQuery(document).ready(function ($) {
                 there was an error of any sort. Returns true if the entry
                 already exists in the database.
     */
-    function presetEntryExists() {
+    function imgMD_presetEntryExists() {
         var entryExists = false;
-        var entryName = document.getElementById('entryName');
+        var entryName = document.getElementById('imgMD_entry_name');
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'dbPresetEntryExists',
-                entry_name: entryName.value
+                action: 'imgMD_dbPresetEntryExists',
+                imgMD_entry_name: entryName.value
             },
             // Ensures the ajax request finishes before continuing.
             async: false,
@@ -139,14 +139,14 @@ jQuery(document).ready(function ($) {
                  location database. Returns false if it does not exist or if 
                  there is an error. Returns true if it does exist.
     */
-    function locationEntryExists(locationName) {
+    function imgMD_locationEntryExists(locationName) {
         var entryExists = false;
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'dbLocationEntryExists',
-                location_name: locationName
+                action: 'imgMD_dbLocationEntryExists',
+                imgMD_location_name: locationName
             },
             // Ensures the ajax request finishes before continuing.
             async: false,
@@ -167,14 +167,14 @@ jQuery(document).ready(function ($) {
     Description: Gathers the information in the various preset fields and sends
                  it through an ajax call to add to the preset database.
     */
-    function addPreset() {
+    function imgMD_addPreset() {
 
-        var locationSelect = document.getElementById('locationsSelect');
+        var locationsSelect = document.getElementById('imgMD_locations_select');
         var selectedLocation =
-            locationSelect.options[locationSelect.selectedIndex].value;
-        var entryName = document.getElementById('entryName');
-        var altText = document.getElementById('altText');
-        var phone = document.getElementById('phone');
+            locationsSelect.options[locationsSelect.selectedIndex].value;
+        var entryName = document.getElementById('imgMD_entry_name');
+        var altText = document.getElementById('imgMD_alt_text');
+        var phone = document.getElementById('imgMD_phone');
 
         // Remove the trailing new line.
         links = links.replace(/\n$/, '');
@@ -183,12 +183,12 @@ jQuery(document).ready(function ($) {
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'dbAddPresetEntry',
-                entry_name: entryName.value,
-                entry_alt_txt: altText.value,
-                entry_phone: phone.value,
-                img_meta_links: links,
-                entry_location: selectedLocation
+                action: 'imgMD_dbAddPresetEntry',
+                imgMD_entry_name: entryName.value,
+                imgMD_entry_alt_txt: altText.value,
+                imgMD_entry_phone: phone.value,
+                imgMD_links: links,
+                imgMD_entry_location: selectedLocation
             },
             error: function () {
                 alert('Error adding the preset entry to the database.');
@@ -201,13 +201,13 @@ jQuery(document).ready(function ($) {
                  entry name removed from the preset database and its associated
                  links in the link database. 
     */
-    function removeEntry(entryName) {
+    function imgMD_removeEntry(entryName) {
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'dbRemovePresetEntry',
-                entry_name: entryName
+                action: 'imgMD_dbRemovePresetEntry',
+                imgMD_entry_name: entryName
             },
             error: function () {
                 alert('Error when removing entry.');
@@ -221,14 +221,14 @@ jQuery(document).ready(function ($) {
                  and links. If the ajax request succeeds it takes all that data
                  in array form and sets the various fields associated.
     */
-    function returnEntry(entry) {
+    function imgMD_returnEntry(entry) {
 
         $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'dbReturnPresetEntry',
-                entry_name: entry
+                action: 'imgMD_dbReturnPresetEntry',
+                imgMD_entry_name: entry
             },
             success: function (data) {
                 entryData = JSON.parse(data);
@@ -239,38 +239,38 @@ jQuery(document).ready(function ($) {
                 // have no location on the selected images(s).
                 var option, i = 0;
                 var locationOutput =
-                    document.getElementById('locationsSelectOutput');
+                    document.getElementById('imgMD_location_select_output');
                 while (option = locationOutput.options[i++]) {
-                    if (option.value == entryData[0]['entry_location']) {
+                    if (option.value == entryData[0]['imgMD_entry_location']) {
                         option.selected = true;
                         break;
                     }
                 }
 
-                document.getElementById('entryNameOutput').value =
-                    entryData[0]['entry_name'];
-                document.getElementById('altTextOutput').value =
-                    entryData[0]['entry_alt_txt'];
-                document.getElementById('phoneOutput').value =
-                    entryData[0]['entry_phone'];
+                document.getElementById('imgMD_entry_name_upload').value =
+                    entryData[0]['imgMD_entry_name'];
+                document.getElementById('imgMD_alt_text_upload').value =
+                    entryData[0]['imgMD_entry_alt_txt'];
+                document.getElementById('imgMD_phone_upload').value =
+                    entryData[0]['imgMD_entry_phone'];
 
                 linkVal = "";
                 descriptionVal =
-                    entryData[0]['entry_alt_txt'] + '\n' +
-                    entryData[0]['entry_name'] + '\n' +
-                    entryData[0]['entry_phone'] + '\n';
+                    entryData[0]['imgMD_entry_alt_txt'] + '\n' +
+                    entryData[0]['imgMD_entry_name'] + '\n' +
+                    entryData[0]['imgMD_entry_phone'] + '\n';
 
                 // Puts the links in a nice comma-separated string.
                 for (var i = 0; i < entryData.length; i++) {
-                    var link = entryData[i].link;
+                    var link = entryData[i].imgMD_link_text;
                     linkVal = linkVal + link + ', ';
                     descriptionVal = descriptionVal + link + '\n';
                 }
 
                 // Remove trailing comma and space.
                 linkVal = linkVal.replace(/, $/, '');
-                document.getElementById('linksOutput').value = linkVal;
-                document.getElementById('descriptionOutput').value =
+                document.getElementById('imgMD_links_upload').value = linkVal;
+                document.getElementById('imgMD_description_upload').value =
                     descriptionVal;
             },
             error: function () {
@@ -284,19 +284,19 @@ jQuery(document).ready(function ($) {
                  selects a different entry to display or when an entry gets 
                  deleted.
     */
-    function clearEntryData() {
-        document.getElementById('entryNameOutput').value = "";
-        document.getElementById('altTextOutput').value = "";
-        document.getElementById('phoneOutput').value = "";
-        document.getElementById('linksOutput').value = "";
-        document.getElementById('descriptionOutput').value = "";
+    function imgMD_clearEntryData() {
+        document.getElementById('imgMD_entry_name_upload').value = "";
+        document.getElementById('imgMD_alt_text_upload').value = "";
+        document.getElementById('imgMD_phone_upload').value = "";
+        document.getElementById('imgMD_links_upload').value = "";
+        document.getElementById('imgMD_description_upload').value = "";
     }
 
     /*
     Description: This just allows the user to highlight their location choice
                  so they can be sure which location they are deleting.
     */
-    $('.location_list').on('click', 'li', function () {
+    $('.imgMD_location_list').on('click', 'li', function () {
         $('.highlight').removeClass('highlight');
         $(this).addClass('highlight');
     });
@@ -305,20 +305,20 @@ jQuery(document).ready(function ($) {
     Description: This just keeps the description part dynamic when the user is
                  adding a new preset.
     */
-    document.getElementById('formTest').oninput = function () {
-        writeDescription();
+    document.getElementById('imgMD_add_preset_form').oninput = function () {
+        imgMD_writeDescription();
     };
 
     /*
     Description: When this add button is clicked it adds a link to the link list
                  and to the bottom of the description.
     */
-    document.getElementById('addLinkBtn').onclick = function () {
-        var link = document.getElementById('link');
+    document.getElementById('imgMD_add_link_btn').onclick = function () {
+        var link = document.getElementById('imgMD_link');
         if (link.value.trim() != "") {
             links = links + link.value + '\n';
             link.value = "";
-            writeDescription();
+            imgMD_writeDescription();
         }
     };
 
@@ -330,24 +330,24 @@ jQuery(document).ready(function ($) {
                  database through the addPreset function call, clears the
                  fields, and writes the description again (blank).
     */
-    document.getElementById('addEntryBtn').onclick = function () {
+    document.getElementById('imgMD_add_entry_btn').onclick = function () {
         // Ensure no blank entry names get accepted.
-        var entryName = document.getElementById('entryName');
-        var altText = document.getElementById('altText');
-        var phone = document.getElementById('phone');
+        var entryName = document.getElementById('imgMD_entry_name');
+        var altText = document.getElementById('imgMD_alt_text');
+        var phone = document.getElementById('imgMD_phone');
         entryName.value = entryName.value.trim();
         if (entryName.value != "") {
-            if (!presetEntryExists()) {
+            if (!imgMD_presetEntryExists()) {
                 var option = document.createElement("option");
                 option.value = entryName.value;
                 option.text = entryName.value;
-                document.getElementById('entriesSelect').add(option);
-                addPreset();
+                document.getElementById('imgMD_entries_select').add(option);
+                imgMD_addPreset();
                 entryName.value = "";
                 altText.value = "";
                 phone.value = "";
                 links = "";
-                writeDescription();
+                imgMD_writeDescription();
             }
             else {
                 alert('Entry name has already been used. Try again.');
@@ -362,16 +362,16 @@ jQuery(document).ready(function ($) {
     Description: When the delete entry button is clicked we check to see what
                  entry the user wants to be deleted. If it isn't the "NO DATA"
                  option, because we always want that there, then we remove the
-                 entry from the database through removeEntry, clear the entry
+                 entry from the database through imgMD_removeEntry, clear the entry
                  output data, and remove the select.
     */
-    document.getElementById('deleteEntryBtn').onclick = function () {
-        var addEntrySelect = document.getElementById('entriesSelect');
+    document.getElementById('imgMD_delete_entry_btn').onclick = function () {
+        var addEntrySelect = document.getElementById('imgMD_entries_select');
         var entry = addEntrySelect.options[addEntrySelect.selectedIndex].text;
         if (entry != "NO DATA") {
-            removeEntry(entry);
-            clearEntryData();
-            $("#entriesSelect option:selected").remove();
+            imgMD_removeEntry(entry);
+            imgMD_clearEntryData();
+            $("#imgMD_entries_select option:selected").remove();
         }
     };
 
@@ -383,11 +383,11 @@ jQuery(document).ready(function ($) {
                  added to the location database and the location fields are
                  cleared.
     */
-    document.getElementById('addLocationBtn').onclick = function () {
-        var cityName = document.getElementById('cityName');
-        var stateName = document.getElementById('stateName');
-        var latitude = document.getElementById('latitude');
-        var longitude = document.getElementById('longitude');
+    document.getElementById('imgMD_add_location_btn').onclick = function () {
+        var cityName = document.getElementById('imgMD_city_name');
+        var stateName = document.getElementById('imgMD_state_name');
+        var latitude = document.getElementById('imgMD_latitude');
+        var longitude = document.getElementById('imgMD_longitude');
 
         if ((cityName.value.trim() != "") &&
             (stateName.value.trim() != "") &&
@@ -397,8 +397,8 @@ jQuery(document).ready(function ($) {
             var locationName = cityName.value.trim() +
                 ", " +
                 stateName.value.trim();
-            if (!locationEntryExists(locationName)) {
-                addLocationDbEntry(locationName,
+            if (!imgMD_locationEntryExists(locationName)) {
+                imgMD_addLocationDbEntry(locationName,
                     latitude.value,
                     longitude.value);
                 cityName.value = "";
@@ -420,10 +420,10 @@ jQuery(document).ready(function ($) {
                  emptied, link field is emptied, and the description is typed
                  again to reflect this.
     */
-    document.getElementById('clearLinksBtn').onclick = function () {
+    document.getElementById('imgMD_clear_links_btn').onclick = function () {
         links = "";
-        document.getElementById('link').value = "";
-        writeDescription();
+        document.getElementById('imgMD_link').value = "";
+        imgMD_writeDescription();
     };
 
     /*
@@ -435,8 +435,8 @@ jQuery(document).ready(function ($) {
                  which are used to repopulate the location lists once the data
                  is cleared.
     */
-    document.getElementById('deleteLocationBtn').onclick = function () {
-        var locationList = document.getElementById("locationList");
+    document.getElementById('imgMD_delete_location_btn').onclick = function () {
+        var locationList = document.getElementById("imgMD_location_list");
         var listItems = locationList.getElementsByTagName('li');
         var selectedItem = '';
 
@@ -451,13 +451,13 @@ jQuery(document).ready(function ($) {
                 url: ajaxurl,
                 type: 'POST',
                 data: {
-                    action: 'dbRemoveLocationEntry',
-                    location_name: selectedItem
+                    action: 'imgMD_dbRemoveLocationEntry',
+                    imgMD_location_name: selectedItem
                 },
                 success: function (data) {
                     locations = JSON.parse(data);
-                    clearLocationData();
-                    repopulateLocationData(locations);
+                    imgMD_clearLocationData();
+                    imgMD_repopulateLocationData(locations);
                 },
                 error: function () {
                     alert('Error deleting the location.');
@@ -469,20 +469,20 @@ jQuery(document).ready(function ($) {
     /*
     Description: When the user selects a new entry from the dropdown this
                  function is triggered. If the entry selected is "NO DATA", the
-                 fields are emptied. Otherwise returnEntry is called to handle
+                 fields are emptied. Otherwise imgMD_returnEntry is called to handle
                  the database interaction required to get the entry information.
     */
-    document.getElementById('entriesSelect').onchange = function () {
-        var addEntrySelect = document.getElementById('entriesSelect');
+    document.getElementById('imgMD_entries_select').onchange = function () {
+        var addEntrySelect = document.getElementById('imgMD_entries_select');
         var entry = addEntrySelect.options[addEntrySelect.selectedIndex].text;
 
         if (entry == "NO DATA") {
-            clearEntryData();
+            imgMD_clearEntryData();
             document.getElementById(
-                'locationsSelectOutput').options[0].selected = true;
+                'imgMD_location_select_output').options[0].selected = true;
         }
         else {
-            returnEntry(entry);
+            imgMD_returnEntry(entry);
         }
     };
 });

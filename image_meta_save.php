@@ -22,144 +22,137 @@ You should have received a copy of the GNU General Public License
 along with Image Meta Save. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once(ABSPATH . 'wp-content/plugins/image_meta_data/ajax_functions.php');
-require_once(ABSPATH . 'wp-content/plugins/image_meta_data/admin_functions.php');
+require_once(plugin_dir_path(__FILE__) . 'ajax_functions.php');
+require_once(plugin_dir_path(__FILE__) . 'admin_functions.php');
 
-add_action('admin_menu', 'img_meta_setup_menu');
-register_activation_hook( __FILE__, 'data_create_db' );
+add_action('admin_menu', 'imgMD_setup_menu');
+register_activation_hook( __FILE__, 'imgMD_create_db' );
 
-function enqueue_external_files()
+function imgMD_enqueue_external_files()
 {
     // Adds the external css file
-    wp_enqueue_style('plugin_style', 
-                     WP_PLUGIN_URL . '/' .str_replace(basename(__FILE__), 
-                     "",
-                     plugin_basename(__FILE__)) . 'css/admin.css');
+    wp_enqueue_style('plugin_style', plugins_url('css/admin.css', __FILE__));
 
     // Adds jquery and external js file
     wp_enqueue_script('jquery');
-    wp_enqueue_script('plugin_script',
-                      WP_PLUGIN_URL . '/' .str_replace(basename(__FILE__),
-                      "",
-                      plugin_basename(__FILE__)) . 'js/admin.js', 
-                      array('jquery'), '1.0', true);
+    wp_enqueue_script('plugin_script', plugins_url('js/admin.js', __FILE__));
 }
  
-function img_meta_setup_menu()
+function imgMD_setup_menu()
 {
     $my_page = add_menu_page('Image Meta Save', 
                              'Image Meta Save',
                              'manage_options',
                              'image-meta-save',
-                             'img_meta_init' );
+                             'imgMD_init' );
 
     // Load the JS and CSS conditionally to avoid loading on other admin pages
-    add_action('load-' . $my_page, 'load_admin_scripts_and_styles');
+    add_action('load-' . $my_page, 'imgMD_load_admin_scripts_and_styles');
 }
 
-function load_admin_scripts_and_styles()
+function imgMD_load_admin_scripts_and_styles()
 {
-    add_action('admin_enqueue_scripts', 'enqueue_external_files');
+    add_action('admin_enqueue_scripts', 'imgMD_enqueue_external_files');
 }
  
-function img_meta_init()
+function imgMD_init()
 {
-    img_meta_handle();
+    imgMD_handle();
 
 ?>
     <body>
-        <div class='header_div'>        
+        <div class='imgMD_header_div'>        
             <h1>Image Meta Save<br></h1>
             <h4>
                 Upload images to the media library with saved meta data information
             </h4>
         </div>
-        <hr class='line_divider'/>
-        <div class='location_div'>
+        <hr class='imgMD_line_divider'/>
+        <div class='imgMD_location_div'>
             <div>
                 <h2><u>Add a Location</u></h2>
-                <form id='locationform'>
-                    City Name: <input type='text' id='cityName' required /> <br>
-                    State Name: <input type='text' id='stateName' required /> <br>
-                    Latitude: <input type='number' id='latitude' required /> <br>
-                    Longitude: <input type='number' id='longitude' required /> <br>
+                <form>
+                    City Name: <input type='text' id='imgMD_city_name' required /> <br>
+                    State Name: <input type='text' id='imgMD_state_name' required /> <br>
+                    Latitude: <input type='number' id='imgMD_latitude' required /> <br>
+                    Longitude: <input type='number' id='imgMD_longitude' required /> <br>
                 </form>
                 <br>
-                <button type="button" id="addLocationBtn">
+                <button type="button" id="imgMD_add_location_btn">
                     Add Location
                 </button>
             </div>
             <div>
                 <h2><u>Delete a Location</u></h2>
-                <ul id='locationList' class='location_list'>
+                <ul id='imgMD_location_list' class='imgMD_location_list'>
                 <?php
-                    $classes = array('loc_list_item');
-                    populateLocationOptions('li', $classes);
+                    $classes = array('imgMD_location_list_item');
+                    imgMD_populateLocationOptions('li', $classes);
                 ?>
                 </ul>
-                <button type="button" id="deleteLocationBtn">
+                <button type="button" id="imgMD_delete_location_btn">
                     Delete
                 </button>
             </div>
         </div>
-        <hr class='line_divider'/>
-        <div class='preset_div'>
+        <hr class='imgMD_line_divider'/>
+        <div class='imgMD_preset_div'>
             <div>
                 <h2><u>Add a Preset</u></h2>
-                <form id='formTest'>
-                    Name (required): <input type='text' id='entryName' required /> <br>
-                    Alt-txt: <input type='text' id='altText' /> <br>
-                    Phone Number: <input type="text" id="phone" /><br>
-                    Location <select id="locationsSelect">
+                <form id='imgMD_add_preset_form'>
+                    Name (required): <input type='text' id='imgMD_entry_name' required /> <br>
+                    Alt-txt: <input type='text' id='imgMD_alt_text' /> <br>
+                    Phone Number: <input type="text" id="imgMD_phone" /><br>
+                    Location <select id="imgMD_locations_select">
                         <option>NO LOCATION DATA</option>
                         <?php
-                            populateLocationOptions('option');
+                            imgMD_populateLocationOptions('option');
                         ?>
                     </select>
                     <br>
-                    Link: <input type="text" id="link"/> 
-                        <button type="button" id="addLinkBtn">
+                    Link: <input type="text" id="imgMD_link"/> 
+                        <button type="button" id="imgMD_add_link_btn">
                             Add
                         </button> 
-                        <button type="button" id="clearLinksBtn">
+                        <button type="button" id="imgMD_clear_links_btn">
                             Clear Links
                         </button> <br>
                 </form>
-                Description : <textarea type="text" id = "description" style="width: 300px; height: 200px; vertical-align:top;" readonly></textarea> <br>
-                <button type="button" id="addEntryBtn"">
+                Description : <textarea type="text" id = "imgMD_description" readonly></textarea> <br>
+                <button type="button" id="imgMD_add_entry_btn"">
                     Add Entry
                 </button>
             </div>
             <div>
                 <h2><u>Upload images (8mb MAX)</u></h2>
-                <select id="entriesSelect">
+                <select id="imgMD_entries_select">
                     <option>NO DATA</option>
                     <?php
                         global $wpdb;
-                        $results = $wpdb->get_col("SELECT entry_name FROM wp_img_meta_locations;");
+                        $results = $wpdb->get_col("SELECT imgMD_entry_name FROM wp_imgMD_presets;");
                         foreach ($results as $result) {
                             echo "<option value='$result'>$result</option>";
                         }
                     ?>
                 </select> 
-                <button type="button" id="deleteEntryBtn">
+                <button type="button" id="imgMD_delete_entry_btn">
                     Delete Entry
                 </button>
 
                 <!-- form to handle the upload - The enctype value here is very important -->
                 <form  method="post" enctype="multipart/form-data">
-                    Name: <input id='entryNameOutput' name='entryNameOutput' readonly/> <br>
-                    Alt-txt: <input id='altTextOutput' name='altTextOutput' readonly/> <br>
-                    Phone Number: <input id='phoneOutput' name='phoneOutput' readonly/> <br>
-                    Location: <select id="locationsSelectOutput" name="locationsSelectOutput">
+                    Name: <input id='imgMD_entry_name_upload' name='imgMD_entry_name_upload' readonly/> <br>
+                    Alt-txt: <input id='imgMD_alt_text_upload' name='imgMD_alt_text_upload' readonly/> <br>
+                    Phone Number: <input id='imgMD_phone_upload' name='imgMD_phone_upload' readonly/> <br>
+                    Location: <select id="imgMD_location_select_output" name="imgMD_location_select_output">
                             <option>NO LOCATION DATA</option>
                             <?php
-                                populateLocationOptions('option');
+                                imgMD_populateLocationOptions('option');
                             ?>
                         </select> <br>
-                    Links: <input id='linksOutput' readonly/> <br>
-                    Description: <textarea id='descriptionOutput' name='descriptionOutput' style="width: 300px; height: 200px; vertical-align:top;" readonly></textarea> <br>
-                    <input type='file' name='test_upload_img[]' multiple='multiple'></input>
+                    Links: <input id='imgMD_links_upload' readonly/> <br>
+                    Description: <textarea id='imgMD_description_upload' name='imgMD_description_upload' readonly></textarea> <br>
+                    <input type='file' name='imgMD_upload_img[]' multiple='multiple'></input>
                     <?php submit_button('Upload') ?>
                 </form>
             </div>
@@ -168,7 +161,7 @@ function img_meta_init()
 <?php
 }
 
-function data_create_db() 
+function imgMD_create_db() 
 {
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     
@@ -176,36 +169,36 @@ function data_create_db()
     $charset_collate = $wpdb->get_charset_collate();
    
     // Create the preset table
-    $table_name = $wpdb->prefix . 'img_meta_presets';
-    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        entry_id INTEGER NOT NULL AUTO_INCREMENT,
-        entry_name TEXT NOT NULL,
-        entry_alt_txt TEXT NOT NULL,
-        entry_phone TEXT NOT NULL,
-        entry_location TEXT NOT NULL,
-        PRIMARY KEY (entry_id)
+    $presets_table_name = $wpdb->prefix . 'imgMD_presets';
+    $sql = "CREATE TABLE IF NOT EXISTS $presets_table_name (
+        imgMD_entry_id INTEGER NOT NULL AUTO_INCREMENT,
+        imgMD_entry_name TEXT NOT NULL,
+        imgMD_entry_alt_txt TEXT NOT NULL,
+        imgMD_entry_phone TEXT NOT NULL,
+        imgMD_entry_location TEXT NOT NULL,
+        PRIMARY KEY (imgMD_entry_id)
         ) $charset_collate;";
     dbDelta( $sql );
 
     // Create the links table
-    $links_table_name = $wpdb->prefix . 'img_meta_links';
+    $links_table_name = $wpdb->prefix . 'imgMD_links';
     $sql2 = "CREATE TABLE IF NOT EXISTS $links_table_name (
-        link_id INTEGER NOT NULL AUTO_INCREMENT,
-        link TEXT,
-        entry_id INTEGER NOT NULL,
-        FOREIGN KEY(entry_id) REFERENCES $table_name(entry_id),
-        PRIMARY KEY (link_id)
+        imgMD_link_id INTEGER NOT NULL AUTO_INCREMENT,
+        imgMD_link_text TEXT,
+        imgMD_entry_id INTEGER NOT NULL,
+        FOREIGN KEY(imgMD_entry_id) REFERENCES $presets_table_name(imgMD_entry_id),
+        PRIMARY KEY (imgMD_link_id)
         ) $charset_collate;";
     dbDelta( $sql2 );
 
-    // Create the img_meta_locations table
-    $locations_table_name = $wpdb->prefix . 'img_meta_locations';
+    // Create the locations table
+    $locations_table_name = $wpdb->prefix . 'imgMD_locations';
     $sql3 = "CREATE TABLE IF NOT EXISTS $locations_table_name (
-        location_id INTEGER NOT NULL AUTO_INCREMENT,
-        location_name TEXT NOT NULL,
-        latitude DECIMAL(10, 8) NOT NULL,
-        longitude DECIMAL(11, 8) NOT NULL,
-        PRIMARY KEY (location_id)
+        imgMD_location_id INTEGER NOT NULL AUTO_INCREMENT,
+        imgMD_location_name TEXT NOT NULL,
+        imgMD_latitude DECIMAL(10, 8) NOT NULL,
+        imgMD_longitude DECIMAL(11, 8) NOT NULL,
+        PRIMARY KEY (imgMD_location_id)
         ) $charset_collate;";
     dbDelta( $sql3 );
 }

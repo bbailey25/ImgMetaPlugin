@@ -1,36 +1,36 @@
 <?php
 
 // Ajax functions
-add_action('wp_ajax_dbAddPresetEntry', 'dbAddPresetEntry');
-add_action('wp_ajax_dbReturnPresetEntry', 'dbReturnPresetEntry');
-add_action('wp_ajax_dbPresetEntryExists', 'dbPresetEntryExists');
-add_action('wp_ajax_dbRemovePresetEntry', 'dbRemovePresetEntry');
-add_action('wp_ajax_dbAddLocationEntry', 'dbAddLocationEntry');
-add_action('wp_ajax_dbLocationEntryExists', 'dbLocationEntryExists');
-add_action('wp_ajax_dbRemoveLocationEntry', 'dbRemoveLocationEntry');
+add_action('wp_ajax_imgMD_dbAddPresetEntry', 'imgMD_dbAddPresetEntry');
+add_action('wp_ajax_imgMD_dbReturnPresetEntry', 'imgMD_dbReturnPresetEntry');
+add_action('wp_ajax_imgMD_dbPresetEntryExists', 'imgMD_dbPresetEntryExists');
+add_action('wp_ajax_imgMD_dbRemovePresetEntry', 'imgMD_dbRemovePresetEntry');
+add_action('wp_ajax_imgMD_dbAddLocationEntry', 'imgMD_dbAddLocationEntry');
+add_action('wp_ajax_imgMD_dbLocationEntryExists', 'imgMD_dbLocationEntryExists');
+add_action('wp_ajax_imgMD_dbRemoveLocationEntry', 'imgMD_dbRemoveLocationEntry');
 
-function dbAddPresetEntry() 
+function imgMD_dbAddPresetEntry() 
 {
     global $wpdb;
 
     // Grabs all the links.
-    $links = preg_split("/\r\n|\n|\r/", $_POST['img_meta_links']);
+    $links = preg_split("/\r\n|\n|\r/", $_POST['imgMD_links']);
 
     // Inserts the new entry into the preset database.
-    $wpdb->insert('wp_img_meta_presets', array(
-        'entry_name' => $_POST['entry_name'],
-        'entry_alt_txt' => $_POST['entry_alt_txt'],
-        'entry_phone' => $_POST['entry_phone'],
-        'entry_location' => $_POST['entry_location']
+    $wpdb->insert('wp_imgMD_presets', array(
+        'imgMD_entry_name' => $_POST['imgMD_entry_name'],
+        'imgMD_entry_alt_txt' => $_POST['imgMD_entry_alt_txt'],
+        'imgMD_entry_phone' => $_POST['imgMD_entry_phone'],
+        'imgMD_entry_location' => $_POST['imgMD_entry_location']
     ));
 
     // Inserts all the links into the link database with 
     // the corresponding preset id.
     foreach($links as $link) 
     {
-        $sql = "INSERT INTO wp_img_meta_links (link, entry_id) VALUES 
-            ('$link', (SELECT entry_id FROM wp_img_meta_presets WHERE 
-            entry_name='".$_POST['entry_name']."'));";
+        $sql = "INSERT INTO wp_imgMD_links (imgMD_link_text, imgMD_entry_id) VALUES 
+            ('$link', (SELECT imgMD_entry_id FROM wp_imgMD_presets WHERE 
+            imgMD_entry_name='".$_POST['imgMD_entry_name']."'));";
 
         $wpdb->query($sql);
     };
@@ -40,14 +40,14 @@ function dbAddPresetEntry()
     wp_die(); 
 }
 
-function dbReturnPresetEntry() 
+function imgMD_dbReturnPresetEntry() 
 {
     global $wpdb;
 
     // Grabs the desired preset entry along with the links associated.
-    $sql = "SELECT * FROM wp_img_meta_presets LEFT JOIN wp_img_meta_links ON 
-        wp_img_meta_presets.entry_id = wp_img_meta_links.entry_id WHERE 
-        entry_name = '".$_POST['entry_name']."';";
+    $sql = "SELECT * FROM wp_imgMD_presets LEFT JOIN wp_imgMD_links ON 
+        wp_imgMD_presets.imgMD_entry_id = wp_imgMD_links.imgMD_entry_id WHERE 
+        imgMD_entry_name = '".$_POST['imgMD_entry_name']."';";
     $results = $wpdb->get_results($sql);
 
     // Return it in a friendly json format.
@@ -56,71 +56,71 @@ function dbReturnPresetEntry()
     wp_die();
 }
 
-function dbPresetEntryExists() 
+function imgMD_dbPresetEntryExists() 
 {
     global $wpdb;
 
     // Checks to see if the preset entry exists in the database.
-    $sql = "SELECT * FROM wp_img_meta_presets WHERE entry_name = 
-        '".$_POST['entry_name']."';";
+    $sql = "SELECT * FROM wp_imgMD_presets WHERE imgMD_entry_name = 
+        '".$_POST['imgMD_entry_name']."';";
     echo($wpdb->query($sql));
 
     wp_die();
 }
 
-function dbRemovePresetEntry() {
+function imgMD_dbRemovePresetEntry() {
     global $wpdb;
 
     // Delete entry links first since they are the foreign key.
-    $sql = "DELETE FROM wp_img_meta_links WHERE entry_id = (SELECT entry_id 
-        FROM wp_img_meta_presets WHERE entry_name='".$_POST['entry_name']."');";
+    $sql = "DELETE FROM wp_imgMD_links WHERE imgMD_entry_id = (SELECT imgMD_entry_id 
+        FROM wp_imgMD_presets WHERE imgMD_entry_name='".$_POST['imgMD_entry_name']."');";
     $wpdb->query($sql);
 
     // Delete the preset entry.
-    $wpdb->delete('wp_img_meta_presets', 
-                   array('entry_name' => $_POST['entry_name']));
+    $wpdb->delete('wp_imgMD_presets', 
+                   array('imgMD_entry_name' => $_POST['imgMD_entry_name']));
     
     wp_die();
 }
 
-function dbAddLocationEntry() {
+function imgMD_dbAddLocationEntry() {
     global $wpdb;
 
-    $wpdb->insert('wp_img_meta_locations', array(
-        'location_name' => $_POST['location_name'],
-        'latitude' => $_POST['latitude'],
-        'longitude' => $_POST['longitude']
+    $wpdb->insert('wp_imgMD_locations', array(
+        'imgMD_location_name' => $_POST['imgMD_location_name'],
+        'imgMD_latitude' => $_POST['imgMD_latitude'],
+        'imgMD_longitude' => $_POST['imgMD_longitude']
     ));
 
     // Once it inserts the new location it returns an updated list of locations.
     $results = $wpdb->get_col(
-        "SELECT location_name FROM wp_img_meta_locations;");
+        "SELECT imgMD_location_name FROM wp_imgMD_locations;");
     echo json_encode($results);
 
     wp_die();
 }
 
-function dbLocationEntryExists() {
+function imgMD_dbLocationEntryExists() {
     global $wpdb;
 
     // Checks to see if the location entry exists.
-    $sql = "SELECT * FROM wp_img_meta_locations WHERE location_name =
-        '".$_POST['location_name']."';";
+    $sql = "SELECT * FROM wp_imgMD_locations WHERE imgMD_location_name =
+        '".$_POST['imgMD_location_name']."';";
     echo($wpdb->query($sql));
 
     wp_die();
 }
 
-function dbRemoveLocationEntry() {
+function imgMD_dbRemoveLocationEntry() {
     global $wpdb;
 
     // Remove a location from the database.
-    $wpdb->delete('wp_img_meta_locations', 
-                  array('location_name' => $_POST['location_name']));
+    $wpdb->delete('wp_imgMD_locations', 
+                  array('imgMD_location_name' => $_POST['imgMD_location_name']));
 
     // Return an array of locations still in the database.
     $results = $wpdb->get_col(
-        "SELECT location_name FROM wp_img_meta_locations;");
+        "SELECT imgMD_location_name FROM wp_imgMD_locations;");
     echo json_encode($results);
     
     wp_die();
