@@ -129,7 +129,8 @@ function imgMD_init()
                     <option>NO DATA</option>
                     <?php
                         global $wpdb;
-                        $results = $wpdb->get_col("SELECT imgMD_entry_name FROM wp_imgMD_presets;");
+                        $presets_table_name = $wpdb->prefix . 'imgMD_presets';
+                        $results = $wpdb->get_col("SELECT imgMD_entry_name FROM $presets_table_name;");
                         foreach ($results as $result) {
                             echo "<option>$result</option>";
                         }

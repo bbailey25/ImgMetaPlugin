@@ -6,7 +6,9 @@ Description: This function takes a location name and uses that to fetch location
 */
 function imgMD_dbReturnLocationEntry($locationName) {
     global $wpdb;
-    $sql = "SELECT imgMD_location_name, imgMD_latitude, imgMD_longitude FROM wp_imgMD_locations
+    $locations_table_name = $wpdb->prefix . 'imgMD_locations';
+
+    $sql = "SELECT imgMD_location_name, imgMD_latitude, imgMD_longitude FROM $locations_table_name
         WHERE imgMD_location_name = '$locationName';";
     $results = $wpdb->get_results($sql);
 
@@ -225,8 +227,10 @@ Description: Takes $type (e.g. option, li, etc) and a list of classes
 function imgMD_populateLocationOptions($type, $classes = null)
 {
     global $wpdb;
+    $locations_table_name = $wpdb->prefix . 'imgMD_locations';
+    
     $cities = $wpdb->get_col("SELECT imgMD_location_name FROM 
-        wp_imgMD_locations;");
+        $locations_table_name;");
     
     if ($classes == null)
     {
