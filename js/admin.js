@@ -396,22 +396,19 @@ jQuery(document).ready(function ($) {
             (latitude.value.trim() == "") ||
             (longitude.value.trim() == "")) {
 
-            alert('No location information can be missing. Latitude and \
-                Longitude must be numbers. Try again.');
+            alert('No location information can be missing. Latitude and Longitude must be numbers. Try again.');
             return;
         }
 
         // Range check our latitude and longitude values to make sure they are
         // valid values.
         if (latitude.value < -90 || latitude.value > 90) {
-            alert('Latitude is out of range. Valid values are between -90 and \
-                +90. Try again.');
+            alert('Latitude is out of range. Valid values are between -90 and +90. Try again.');
             return;
         }
 
         if (longitude.value < -180 || longitude.value > 180) {
-            alert('Longitude is out of range. Valid values are between -180 \
-                and +180. Try again.');
+            alert('Longitude is out of range. Valid values are between -180 and +180. Try again.');
             return;
         }
 

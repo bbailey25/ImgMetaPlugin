@@ -101,8 +101,8 @@ function imgMD_dbAddLocationEntry() {
 
     $wpdb->insert('wp_imgMD_locations', array(
         'imgMD_location_name' => $location_name,
-        'imgMD_latitude' => $_POST['imgMD_latitude'],
-        'imgMD_longitude' => $_POST['imgMD_longitude']
+        'imgMD_latitude' => (int) $_POST['imgMD_latitude'],
+        'imgMD_longitude' => (int) $_POST['imgMD_longitude']
     ));
 
     // Once it inserts the new location it returns an updated list of locations.
