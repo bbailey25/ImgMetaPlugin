@@ -124,7 +124,7 @@ function imgMD_init()
                 </button>
             </div>
             <div>
-                <h2><u>Upload images (8mb MAX)</u></h2>
+                <h2><u>Upload images</u></h2>
                 <select id="imgMD_entries_select">
                     <option>NO DATA</option>
                     <?php
