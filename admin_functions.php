@@ -34,18 +34,43 @@ function imgMD_handle()
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         require_once(ABSPATH . 'wp-admin/includes/media.php');
 
+        // Verify the current user can upload files
+        if (!current_user_can('upload_files'))
+        {
+            wp_die(__('You do not have permission to upload files.'));
+        }
+
         $files = $_FILES['imgMD_upload_img'];
         foreach ($files['name'] as $key => $value)
         {
             if ($files['name'][$key])
-            {
+            {   
                 $file = array (
-                    'name' => $files['name'][$key],
-                    'type' => $files['type'][$key],
-                    'tmp_name' => $files['tmp_name'][$key],
-                    'error' => $files['error'][$key],
-                    'size' => $files['size'][$key],
+                    'name' => sanitize_file_name($files['name'][$key]),
+                    'type' => sanitize_text_field($files['type'][$key]),
+                    'tmp_name' => sanitize_text_field($files['tmp_name'][$key]),
+                    'error' => (int) $files['error'][$key],
+                    'size' => (int) $files['size'][$key],
                 );
+
+                // Check the extension of the file to make sure it's in
+                // an allowable format.
+                switch ($file['type'])
+                {
+                    case "image/png":
+                    case "image/jpeg":
+                        break;
+                    default:
+                        printf("You tried to load a %s file called %s, but are restricted to image files only. Please load images with a file type of .jpg, .jpeg, or .png only.<br>", $file['type'], $file['name']);
+                        continue 2;
+                }
+
+                // Check to see if the file is actually an image file.
+                if (empty(getimagesize($file['tmp_name'])))
+                {
+                    printf("The file %s does not appear to be an image file.<br>", $file['name']);
+                    continue;
+                }
                 
                 $exifLatitude       = '';
                 $exifLatitudeRef    = '';
